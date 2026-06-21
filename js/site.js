@@ -60,7 +60,28 @@
   (function initGL() {
     var wrap = qs('.hero-gl');
     var hero = qs('.hero');
-    if (!wrap || !hero || !window.THREE) { return; }
+    if (!wrap || !hero) { return; }
+
+    // Connection-aware loading: three.js is ~150 KB gzipped and only powers a
+    // decorative particle field. Skip it on data-saver or slow links (2g/3g) —
+    // the hero still shows its paper + grain texture and the headline, so the
+    // page never looks broken without it.
+    var conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (conn && (conn.saveData || /(slow-2g|2g|3g)/.test(conn.effectiveType || ''))) { return; }
+
+    // Lazily fetch three.js only once we've decided the connection can afford it.
+    if (!window.THREE) {
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js';
+      s.onload = build;
+      document.head.appendChild(s);
+      return;
+    }
+    build();
+
+    function build() {
+    if (!window.THREE) { return; }
 
     var renderer;
     try {
@@ -198,13 +219,9 @@
     hero.addEventListener('pointermove', function (e) { splashAt(e.clientX, e.clientY, 1); }, { passive: true });
     hero.addEventListener('pointerdown', function (e) { splashAt(e.clientX, e.clientY, 1.7); }, { passive: true });
 
-    // — accent color follows the Tweaks panel —
-    var frame = 0;
-    function syncAccent() {
-      var acc = getComputedStyle(document.documentElement).getPropertyValue('--acc').trim();
-      if (acc) { uniforms.uAccent.value.set(acc); }
-    }
-    syncAccent();
+    // — accent color, read once from CSS (it never changes at runtime) —
+    var acc = getComputedStyle(document.documentElement).getPropertyValue('--acc').trim();
+    if (acc) { uniforms.uAccent.value.set(acc); }
 
     // — render loop (pauses when hero is offscreen / tab hidden) —
     var visible = true;
@@ -228,7 +245,6 @@
       uniforms.uTime.value = t;
       uniforms.uMouse.value.lerp(target, 0.055);
       uniforms.uStrength.value += (targetStrength - uniforms.uStrength.value) * 0.04;
-      if (++frame % 30 === 0) { syncAccent(); }
       renderer.render(scene, camera);
     }
 
@@ -255,6 +271,7 @@
         scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true }
       });
     }
+    } // build()
   })();
 
   /* ————————————————————————————————————————————

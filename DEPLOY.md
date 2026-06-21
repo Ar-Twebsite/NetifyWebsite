@@ -48,3 +48,23 @@ CNAME   www   ar-twebsite.github.io.
 ## Regenerating assets (optional)
 - Icons + OG card: re-run the Pillow/fontTools script logic in `tools/` (needs `pip install Pillow fonttools brotli`).
 - The original single-file export lives in git history (commit `e1b6095`); `tools/extract.py` can re-derive `css/`, `js/`, `fonts/` from it.
+
+## Performance (mobile)
+- **Editing the CSS:** `css/site.css` is the single source of truth. The landing
+  pages (`index.html`, `it/index.html`) inline a copy of it to avoid a
+  render-blocking stylesheet request. After any change to `css/site.css`, re-run:
+  ```
+  python tools/inline-css.py
+  ```
+  This restamps the CSS between the `<!-- css:inline:start/end -->` markers.
+  `privacy.html` / `terms.html` still link the external sheet, so it stays loaded.
+- **three.js (hero particles)** is loaded on demand by `js/site.js` and skipped on
+  data-saver / slow (2g/3g) connections. The hero degrades to its static texture.
+- **Cache lifetimes (the "Use efficient cache lifetimes" Lighthouse audit):**
+  GitHub Pages serves every file with a fixed `Cache-Control: max-age=600` (10 min)
+  and **does not let you change it** — so this audit can't be fully cleared while
+  hosting on Pages. The fix is to front the site with a CDN that controls headers:
+  put **Cloudflare** (free plan) in front of the domain and add a cache rule giving
+  the hashed `/fonts/`, `/css/`, `/js/`, `/assets/` paths a long `max-age`
+  (e.g. 1 year) — they're content-hashed/stable so that's safe. Cloudflare Pages or
+  Netlify (via `_headers`) would achieve the same if you ever migrate off Pages.
