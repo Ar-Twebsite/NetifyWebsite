@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://netifytraining.com/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://netifytraining.com/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://netifytraining.com/it/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://netifytraining.com/"/>
+    <lastmod>2026-06-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://netifytraining.com/it/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://netifytraining.com/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://netifytraining.com/it/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://netifytraining.com/"/>
+    <lastmod>2026-06-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://netifytraining.com/privacy.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://netifytraining.com/privacy.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://netifytraining.com/it/privacy.html"/>
+    <lastmod>2026-06-21</lastmod>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://netifytraining.com/terms.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://netifytraining.com/terms.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://netifytraining.com/it/terms.html"/>
+    <lastmod>2026-06-21</lastmod>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://netifytraining.com/it/privacy.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://netifytraining.com/privacy.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://netifytraining.com/it/privacy.html"/>
+    <lastmod>2026-06-21</lastmod>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://netifytraining.com/it/terms.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://netifytraining.com/terms.html"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://netifytraining.com/it/terms.html"/>
+    <lastmod>2026-06-21</lastmod>
+    <priority>0.3</priority>
+  </url>
+</urlset>
