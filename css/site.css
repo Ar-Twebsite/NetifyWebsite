@@ -188,3 +188,20 @@ figcaption{font-family:var(--editorial);font-style:italic;font-weight:400;text-t
 .ro-dlg .ro-tag{flex:0 0 auto;padding:4px 7px;border:1px solid var(--ink);background:var(--ivory);font-family:var(--mono);font-size:8px;letter-spacing:.04em}
 .ro-dlg .ro-line{flex:1;margin-top:0}
 .ro-seal{position:absolute;display:grid;place-items:center;width:30px;height:30px;border:2px solid var(--green);color:var(--green);font-size:14px;transform:rotate(-6deg)}
+
+/* Emblem settle — elements land in sequence during the arrival act */
+@media (prefers-reduced-motion:no-preference){
+.js .route-object>span{animation:emIn .4s cubic-bezier(.22,.61,.36,1) both}
+.js .route-object>span:nth-child(1){animation-delay:.22s}
+.js .route-object>span:nth-child(2){animation-delay:.3s}
+.js .route-object>span:nth-child(3){animation-delay:.38s}
+.js .route-object>span:nth-child(4){animation-delay:.46s}
+.js .route-object>span:nth-child(5){animation-delay:.54s}
+.js .route-object>span:nth-child(6){animation-delay:.62s}
+.js .route-object>span:nth-child(7){animation-delay:.7s}
+.js .route-object>span.ro-flow{animation-name:emFlow;transform-origin:left center}
+.js .route-object>span.ro-seal{animation-name:emSeal}
+}
+@keyframes emIn{from{translate:0 11px}to{translate:0 0}}
+@keyframes emFlow{from{scale:0 1}to{scale:1 1}}
+@keyframes emSeal{from{scale:1.6}to{scale:1}}
