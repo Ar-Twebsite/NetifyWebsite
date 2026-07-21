@@ -200,8 +200,61 @@
       Array.prototype.forEach.call(document.querySelectorAll(".pen-mark.pen-live"),function(el){el.classList.remove("pen-live");el.classList.add("pen-static");});
     },{once:true,passive:true});
   }
+  function reveals(){
+    var els=document.querySelectorAll(".rv");
+    if(!els.length)return;
+    if(!("IntersectionObserver" in window)||window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+      Array.prototype.forEach.call(els,function(el){el.classList.add("is-in");});return;
+    }
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("is-in");io.unobserve(e.target);}});
+    },{threshold:.16,rootMargin:"0px 0px -8%"});
+    Array.prototype.forEach.call(els,function(el){io.observe(el);});
+  }
+  function mdemo(){
+    var p=document.querySelector("[data-mdemo]");
+    if(!p)return;
+    var wishT=p.getAttribute("data-wish")||"";
+    var wish=p.querySelector(".wish-text"),caret=p.querySelector(".wish-caret"),
+        file=p.querySelector(".demo-file"),lines=p.querySelectorAll(".status-line"),
+        card=p.querySelector(".demo-course");
+    function finish(){
+      if(wish)wish.textContent=wishT;
+      if(file)file.classList.add("is-in");
+      Array.prototype.forEach.call(lines,function(l){l.classList.remove("is-active");l.classList.add("is-done");});
+      if(card)card.classList.add("is-in");
+      if(caret)caret.classList.add("is-off");
+    }
+    if(window.matchMedia("(prefers-reduced-motion: reduce)").matches||!("IntersectionObserver" in window)){finish();return;}
+    // il markup arriva completo (no-JS); qui lo azzeriamo e lo rigiochiamo
+    if(wish)wish.textContent="";
+    if(file)file.classList.remove("is-in");
+    Array.prototype.forEach.call(lines,function(l){l.classList.remove("is-done","is-active");});
+    if(card)card.classList.remove("is-in");
+    var started=false;
+    function run(){
+      if(started)return;started=true;
+      if(caret)caret.classList.remove("is-off");
+      var i=0;
+      (function type(){
+        if(i<=wishT.length){wish.textContent=wishT.slice(0,i);i++;window.setTimeout(type,26);return;}
+        window.setTimeout(function(){if(file)file.classList.add("is-in");},220);
+        var k=0;
+        window.setTimeout(function step(){
+          if(k>0){lines[k-1].classList.remove("is-active");lines[k-1].classList.add("is-done");}
+          if(k<lines.length){lines[k].classList.add("is-active");k++;window.setTimeout(step,640);return;}
+          if(caret)caret.classList.add("is-off");
+          window.setTimeout(function(){if(card)card.classList.add("is-in");},180);
+        },500);
+      })();
+    }
+    var io=new IntersectionObserver(function(es){if(es[0].isIntersecting){io.disconnect();run();}},{threshold:.35});
+    io.observe(p);
+  }
   stickyCta();
   fitRouter();
+  reveals();
+  mdemo();
   if(document.fonts&&document.fonts.ready){document.fonts.ready.then(penInk);}else{penInk();}
   root.dataset.coreReady="true";
 })();
