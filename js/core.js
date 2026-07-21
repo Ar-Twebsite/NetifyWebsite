@@ -124,7 +124,7 @@
       requestAnimationFrame(frame);
     }
     Array.prototype.forEach.call(marks,function(m){
-      var host=m.closest("h1")||m.parentElement;
+      var host=m.closest("h1,h2")||m.parentElement;
       if(!host)return;
       var started=false;
       function fallbackStatic(){m.classList.remove("pen-live");m.classList.add("pen-static");}
@@ -184,12 +184,17 @@
       // consecutive: prima finisce l'ingresso, poi (pausa breve) parte la penna
       var kicked=false;
       function kick(delay){if(kicked)return;kicked=true;window.setTimeout(start,delay);}
+      var inHero=!!m.closest(".hero-copy,.route-hero-copy");
       try{
-        var anims=host.getAnimations?host.getAnimations():[];
+        var anims=inHero&&host.getAnimations?host.getAnimations():[];
         if(anims.length){
-          // la penna entra a scena ferma: dopo l'ingresso e l'assestamento dei documenti
+          // hero: la penna entra a scena ferma, dopo ingresso e assestamento
           Promise.all(anims.map(function(a){return a.finished;})).then(function(){kick(500);},function(){kick(500);});
           window.setTimeout(function(){kick(500);},2600); // rete di sicurezza
+        }else if(!inHero&&("IntersectionObserver" in window)){
+          // titoli di sezione: la penna sottolinea quando il titolo entra in scena
+          var vio=new IntersectionObserver(function(es){if(es[0].isIntersecting){vio.disconnect();kick(280);}},{threshold:.7});
+          vio.observe(host);
         }else{
           kick(900);
         }

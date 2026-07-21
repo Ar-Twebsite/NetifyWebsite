@@ -16,7 +16,7 @@
   load("/assets/vendor/gsap/gsap.min.js").then(function(){
     return load("/assets/vendor/gsap/ScrollTrigger.min.js");
   }).then(function(){
-    return load("/js/motion-runtime.js?v=20260721-proof3");
+    return load("/js/motion-runtime.js?v=20260721-proof4");
   }).catch(function(){
     document.documentElement.classList.add("motion-failed");
   });
