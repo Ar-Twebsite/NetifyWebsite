@@ -9,10 +9,6 @@
   var api=window.__NETIFY_MOTION__=window.__NETIFY_MOTION__||{};
   gsap.registerPlugin(ScrollTrigger);
 
-  function setupHero(scope){
-    gsap.to(scope.querySelectorAll(".hero-enter"),{opacity:1,y:0,duration:.52,stagger:.075,ease:"power2.out",clearProps:"transform"});
-  }
-
   function copyTransition(timeline,copies,current,next,at,end){
     timeline.set(copies[current],{autoAlpha:0,y:0},end)
       .set(copies[next],{autoAlpha:1,y:0},end);
@@ -131,10 +127,10 @@
   }
 
   mm.add("(min-width:1121px) and (prefers-reduced-motion:no-preference)",function(){
-    return gsap.context(function(){root.classList.add("motion-ready");setupHero(body);setupSignature(body);setupRouteScenes(body);pointerRefinement(body);},body);
+    return gsap.context(function(){root.classList.add("motion-ready");setupSignature(body);setupRouteScenes(body);pointerRefinement(body);},body);
   });
   mm.add("(max-width:1120px) and (prefers-reduced-motion:no-preference)",function(){
-    return gsap.context(function(){root.classList.add("motion-ready");setupHero(body);setupRouteScenes(body);pointerRefinement(body);},body);
+    return gsap.context(function(){root.classList.add("motion-ready");setupRouteScenes(body);pointerRefinement(body);},body);
   });
 
   var timer=0;

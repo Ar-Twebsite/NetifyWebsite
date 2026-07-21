@@ -1,4 +1,2 @@
 .DS_Store
 *.log
-# CNAME di produzione: escluso dal repo di test per non reclamare il dominio apex
-CNAME

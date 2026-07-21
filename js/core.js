@@ -88,6 +88,120 @@
     new IntersectionObserver(function(entries){header.classList.toggle("is-scrolled",!entries[0].isIntersecting);}).observe(marker);
   }
 
+  function fitRouter(){
+    var EV={demo:"netify/demo",explore:"netify/intro",fit:"netify/fit",savings:"netify/savings",platform:"netify/platform"};
+    Array.prototype.forEach.call(document.querySelectorAll("[data-fitlite]"),function(f){
+      var sel=f.querySelector("select"),go=f.querySelector("a.button"),em=f.querySelector("input[type=email]");
+      if(!sel||!go)return;
+      var utm=f.getAttribute("data-utm")||"fitlite";
+      function upd(){
+        var url="https://cal.com/"+(EV[sel.value]||"netify/demo")+"?utm_source=netify&utm_medium=website&utm_content="+utm;
+        var e=em&&em.value.trim();
+        if(e)url+="&email="+encodeURIComponent(e);
+        go.setAttribute("href",url);
+      }
+      sel.addEventListener("change",upd);
+      if(em)em.addEventListener("input",upd);
+      f.addEventListener("submit",function(e){e.preventDefault();});
+      upd();
+    });
+  }
+  function penInk(){
+    if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+    var marks=document.querySelectorAll(".pen-mark");
+    if(!marks.length)return;
+    var NS="http://www.w3.org/2000/svg";
+    function ease(t){return 1-Math.pow(1-t,3);} // veloce all'inizio, rallenta alla fine
+    function tween(dur,step,done){
+      var t0=null;
+      function frame(now){
+        if(t0===null)t0=now;
+        var k=Math.min(1,(now-t0)/dur);
+        step(ease(k));
+        if(k<1)requestAnimationFrame(frame);
+        else if(done)done();
+      }
+      requestAnimationFrame(frame);
+    }
+    Array.prototype.forEach.call(marks,function(m){
+      var host=m.closest("h1")||m.parentElement;
+      if(!host)return;
+      var started=false;
+      function fallbackStatic(){m.classList.remove("pen-live");m.classList.add("pen-static");}
+      function start(){
+        if(started)return;started=true;
+        try{
+          var rects=Array.prototype.slice.call(m.getClientRects()).filter(function(r){return r.width>2;});
+          if(!rects.length||rects.length>4){fallbackStatic();return;}
+          m.classList.add("pen-live");
+          if(getComputedStyle(host).position==="static")host.style.position="relative";
+          var hostRect=host.getBoundingClientRect();
+          var fs=parseFloat(getComputedStyle(m).fontSize)||48;
+          var totalW=rects.reduce(function(a,r){return a+r.width;},0);
+          var frags=rects.map(function(r,i){
+            var first=i===0,last=i===rects.length-1;
+            var svg=document.createElementNS(NS,"svg");
+            svg.setAttribute("class","pen-stroke");
+            svg.setAttribute("viewBox","0 0 100 12");
+            svg.setAttribute("preserveAspectRatio","none");
+            svg.setAttribute("aria-hidden","true");
+            var h=fs*.34;
+            svg.style.left=(r.left-hostRect.left-fs*.03)+"px";
+            svg.style.top=(r.top-hostRect.top+r.height-h*.5)+"px";
+            svg.style.width=(r.width+fs*.06)+"px";
+            svg.style.height=h+"px";
+            svg.innerHTML='<g fill="none" stroke="#FF4B23" stroke-linecap="round">'
+              +(first?'<ellipse class="pen-blot" cx="2.3" cy="5.8" rx=".8" ry=".6" fill="#FF4B23" stroke="none" opacity="0"/>':'')
+              +'<path class="pen-main" d="M2 5.6 Q50 8.2 98 5.2" stroke-width="1.5"/>'
+              +'<path class="pen-echo" d="M2.6 6.2 Q50 8.8 97.2 5.8" stroke-width=".7" opacity=".45"/>'
+              +(last?'<circle class="pen-end" cx="97.7" cy="5.3" r=".5" fill="#FF4B23" stroke="none" opacity="0"/>':'')
+              +'</g>';
+            host.appendChild(svg);
+            var strokes=Array.prototype.map.call(svg.querySelectorAll("path"),function(p){
+              var L=p.getTotalLength();
+              p.setAttribute("stroke-dasharray",L);
+              p.setAttribute("stroke-dashoffset",L);
+              return {p:p,L:L};
+            });
+            return {svg:svg,strokes:strokes,dur:Math.max(260,950*(r.width/totalW))};
+          });
+          function drawFrag(i){
+            if(i>=frags.length)return;
+            var f=frags[i];
+            tween(f.dur,function(k){
+              f.strokes.forEach(function(s){s.p.setAttribute("stroke-dashoffset",s.L*(1-k));});
+            },function(){
+              var end=f.svg.querySelector(".pen-end");
+              if(end)tween(130,function(k){end.setAttribute("opacity",.8*k);});
+              window.setTimeout(function(){drawFrag(i+1);},120); // la penna passa alla riga dopo
+            });
+          }
+          var blot=frags[0].svg.querySelector(".pen-blot");
+          if(blot)tween(140,function(k){blot.setAttribute("opacity",.85*k);});
+          window.setTimeout(function(){drawFrag(0);},90);
+        }catch(err){fallbackStatic();}
+      }
+      // consecutive: prima finisce l'ingresso, poi (pausa breve) parte la penna
+      var kicked=false;
+      function kick(delay){if(kicked)return;kicked=true;window.setTimeout(start,delay);}
+      try{
+        var anims=host.getAnimations?host.getAnimations():[];
+        if(anims.length){
+          // la penna entra a scena ferma: dopo l'ingresso e l'assestamento dei documenti
+          Promise.all(anims.map(function(a){return a.finished;})).then(function(){kick(500);},function(){kick(500);});
+          window.setTimeout(function(){kick(500);},2600); // rete di sicurezza
+        }else{
+          kick(900);
+        }
+      }catch(e){kick(700);}
+    });
+    window.addEventListener("resize",function(){
+      Array.prototype.forEach.call(document.querySelectorAll(".pen-stroke"),function(el){el.parentNode&&el.parentNode.removeChild(el);});
+      Array.prototype.forEach.call(document.querySelectorAll(".pen-mark.pen-live"),function(el){el.classList.remove("pen-live");el.classList.add("pen-static");});
+    },{once:true,passive:true});
+  }
   stickyCta();
+  fitRouter();
+  if(document.fonts&&document.fonts.ready){document.fonts.ready.then(penInk);}else{penInk();}
   root.dataset.coreReady="true";
 })();
