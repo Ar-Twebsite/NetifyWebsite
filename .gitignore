@@ -1,2 +1,7 @@
 .DS_Store
 *.log
+
+# Materiale di lavoro interno — NON deve finire su GitHub Pages.
+# Il sito è servito dalla radice del repo e .nojekyll fa pubblicare ogni cartella:
+# senza questa riga, Audit/ diventerebbe netifytraining.com/Audit/ — pubblico.
+Audit/
